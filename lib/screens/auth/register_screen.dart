@@ -28,15 +28,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   }
 
   void _register() {
-    // TODO: Добавить вызов auth_service.dart
-    // if (_formKey.currentState!.validate()) {
-    //   // ... вызов API
-    // }
-
-    // --- Заглушка для перехода ---
-    // После успешной регистрации возвращаемся на экран входа
     Navigator.pop(context);
-    // --- Конец заглушки ---
   }
 
   @override

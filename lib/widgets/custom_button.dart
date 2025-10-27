@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Переиспользуемая кнопка для экранов входа и регистрации
 class CustomButton extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;

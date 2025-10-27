@@ -23,19 +23,10 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _login() {
-    // TODO: Добавить вызов auth_service.dart
-    // if (_formKey.currentState!.validate()) {
-    //   // Показываем индикатор загрузки
-    //   // ... вызов API
-    // }
-
-    // --- Заглушка для перехода ---
-    // После успешного входа переходим на главный экран
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const MainAppShell()),
     );
-    // --- Конец заглушки ---
   }
 
   @override

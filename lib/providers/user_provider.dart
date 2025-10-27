@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 
-// Этот провайдер хранит данные о ЗАЛОГИНЕННОМ пользователе
-// 'profile_screen.dart' будет брать данные отсюда
-
 class UserProvider with ChangeNotifier {
   UserModel? _user;
 

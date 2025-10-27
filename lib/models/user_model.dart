@@ -1,15 +1,11 @@
-// user_model.dart
 import 'dart:convert';
-
-// user_model.dart
-// Соответствует таблице 'users' в 'schema.sql'
 
 class UserModel {
   final String userId;
   final String email;
   final String firstName;
   final String lastName;
-  final String role; // 'player' или 'coach'
+  final String role;
   final DateTime? dateOfBirth;
   final String? profilePhotoUrl;
 
@@ -23,7 +19,6 @@ class UserModel {
     this.profilePhotoUrl,
   });
 
-  // Фабричный конструктор для парсинга JSON
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
       userId: json['user_id'] as String,
@@ -38,7 +33,6 @@ class UserModel {
     );
   }
 
-  // Метод для сериализации в JSON (на случай, если нужно отправить)
   Map<String, dynamic> toJson() {
     return {
       'user_id': userId,

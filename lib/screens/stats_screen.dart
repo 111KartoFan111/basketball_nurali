@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../widgets/stats_row.dart'; // Импортируем наш виджет
+import '../widgets/stats_row.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -9,14 +9,12 @@ class StatsScreen extends StatefulWidget {
 }
 
 class _StatsScreenState extends State<StatsScreen> {
-  // Переключатель "Моя статистика" / "Команда"
   bool _showMyStats = true;
 
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Сегментированный переключатель
         Padding(
           padding: const EdgeInsets.all(16.0),
           child: SegmentedButton<bool>(
@@ -47,7 +45,6 @@ class _StatsScreenState extends State<StatsScreen> {
           ),
         ),
 
-        // Контент в зависимости от выбора
         Expanded(
           child: _showMyStats
               ? _buildMyStatsView(context)
@@ -57,19 +54,15 @@ class _StatsScreenState extends State<StatsScreen> {
     );
   }
 
-  // Виджет для отображения личной статистики
   Widget _buildMyStatsView(BuildContext context) {
-    // Здесь будет загрузка и отображение статистики ИГРОКА
-    // Используем заглушки
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       children: const [
         Text(
-          'Средние показатели за сезон (заглушка)',
+          'Средние показатели за сезон',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         SizedBox(height: 16),
-        // Используем наш переиспользуемый виджет
         StatsRow(title: 'Очки (PPG)', value: '12.5'),
         StatsRow(title: 'Подборы (RPG)', value: '5.2'),
         StatsRow(title: 'Передачи (APG)', value: '3.1'),
@@ -78,7 +71,7 @@ class _StatsScreenState extends State<StatsScreen> {
         
         SizedBox(height: 24),
         Text(
-          'Последняя игра (заглушка)',
+          'Последняя игра',
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
          SizedBox(height: 16),
@@ -89,9 +82,7 @@ class _StatsScreenState extends State<StatsScreen> {
     );
   }
 
-  // Виджет для отображения командной статистики
   Widget _buildTeamStatsView(BuildContext context) {
-    // Здесь будет загрузка и отображение рейтинга КОМАНДЫ
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       children: [
@@ -100,10 +91,8 @@ class _StatsScreenState extends State<StatsScreen> {
           style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
         ),
         const SizedBox(height: 16),
-        // Заголовок таблицы
         _buildTeamPlayerRow('Игрок', 'Очки', isHeader: true),
         const Divider(color: Colors.white24),
-        // Список игроков (заглушки)
         _buildTeamPlayerRow('1. Алексей Иванов', '15.8'),
         _buildTeamPlayerRow('2. (Вы) Имя Фамилия', '12.5'),
         _buildTeamPlayerRow('3. Сергей Петров', '10.1'),
@@ -112,8 +101,6 @@ class _StatsScreenState extends State<StatsScreen> {
     );
   }
   
-  // Вспомогательный виджет для строки рейтинга команды
-  // (Мы не выносили его в /widgets, так как он используется только здесь)
   Widget _buildTeamPlayerRow(String name, String value, {bool isHeader = false}) {
      return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),

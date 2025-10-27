@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-// Переиспользуемая строка для StatsScreen
 class StatsRow extends StatelessWidget {
   final String title;
   final String value;

@@ -18,9 +18,8 @@ class AuthProvider with ChangeNotifier {
   String? get errorMessage => _errorMessage;
   bool get isAuthenticated => _token != null; // 'ApiService' должен иметь геттер
 
-  // Ссылка на UserProvider, чтобы обновить его
   final UserProvider _userProvider;
-  AuthProvider(this._userProvider); // Получаем UserProvider через конструктор
+  AuthProvider(this._userProvider);
 
   Future<bool> login(String email, String password) async {
     _isLoading = true;
@@ -29,11 +28,9 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final UserModel user = await _authService.login(email, password);
-      
-      // Успех!
       _isLoading = false;
-      _token = '...'; // Установить токен (или просто флаг)
-      _userProvider.setUser(user); // <<-- Обновляем UserProvider
+      _token = '...';
+      _userProvider.setUser(user);
       notifyListeners();
       return true;
 

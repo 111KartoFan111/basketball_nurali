@@ -1,14 +1,9 @@
-// stats_model.dart
-// Эта модель НЕ соответствует 1-в-1 таблице 'player_stats_log'.
-// Скорее всего, это АГРЕГИРОВАННЫЕ данные, которые бэкенд
-// будет считать для 'stats_screen.dart'.
-
 class PlayerAverageStats {
-  final double pointsPerGame; // PPG
-  final double reboundsPerGame; // RPG
-  final double assistsPerGame; // APG
-  final double fieldGoalPercentage; // FG%
-  final double freeThrowPercentage; // FT%
+  final double pointsPerGame;
+  final double reboundsPerGame; 
+  final double assistsPerGame;
+  final double fieldGoalPercentage; 
+  final double freeThrowPercentage;
 
   PlayerAverageStats({
     required this.pointsPerGame,
@@ -20,7 +15,6 @@ class PlayerAverageStats {
 
   factory PlayerAverageStats.fromJson(Map<String, dynamic> json) {
     return PlayerAverageStats(
-      // Используем num и toDouble() для безопасности (вдруг придет int)
       pointsPerGame: (json['ppg'] as num? ?? 0).toDouble(),
       reboundsPerGame: (json['rpg'] as num? ?? 0).toDouble(),
       assistsPerGame: (json['apg'] as num? ?? 0).toDouble(),
@@ -30,8 +24,6 @@ class PlayerAverageStats {
   }
 }
 
-// Эта модель соответствует 'player_stats_log'
-// Используется для лога последних игр
 class GameStatsLog {
   final String statId;
   final String playerId;
@@ -40,7 +32,6 @@ class GameStatsLog {
   final int points;
   final int rebounds;
   final int assists;
-  // ... и т.д.
 
   GameStatsLog({
     required this.statId,

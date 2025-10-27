@@ -1,11 +1,7 @@
-// team_model.dart
-// Соответствует таблице 'teams'
-
 class TeamModel {
   final String teamId;
   final String teamName;
   final String coachId;
-  // Можно добавить List<UserModel> members, если API будет их возвращать
 
   TeamModel({
     required this.teamId,

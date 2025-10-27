@@ -9,10 +9,6 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  // Тут будет логика для загрузки расписания с бэкенда
-
-  // TODO: Заменить этот список на данные из workout_service.dart
-  // (Это просто заглушка)
   final List<Map<String, dynamic>> _workouts = [
     {
       'id': '1',
@@ -38,9 +34,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
   ];
 
   void _onSignUpToggle(String workoutId) {
-    // TODO: Здесь будет вызов workout_service.dart для записи/отмены
-    
-    // Имитация обновления состояния
     setState(() {
       final index = _workouts.indexWhere((w) => w['id'] == workoutId);
       if (index != -1) {
@@ -62,7 +55,6 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // В будущем здесь будет FutureBuilder или StreamBuilder
     return ListView.builder(
       padding: const EdgeInsets.all(16.0),
       itemCount: _workouts.length,

@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-// Карточка для отображения в списке ScheduleScreen
 class WorkoutCard extends StatelessWidget {
   final String title;
   final String location;
   final DateTime dateTime;
   final bool isSignedUp;
-  final VoidCallback onPressed; // Функция обратного вызова при нажатии
+  final VoidCallback onPressed;
 
   const WorkoutCard({
     super.key,
@@ -23,7 +22,7 @@ class WorkoutCard extends StatelessWidget {
     final bool isPast = dateTime.isBefore(DateTime.now());
 
     return Card(
-      color: theme.appBarTheme.backgroundColor, // Цвет как у AppBar
+      color: theme.appBarTheme.backgroundColor,
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       margin: const EdgeInsets.only(bottom: 16),
@@ -33,7 +32,6 @@ class WorkoutCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              // TODO: Использовать пакет intl для красивого форматирования
               '${dateTime.day}.${dateTime.month}.${dateTime.year} - ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}',
               style: TextStyle(
                 color: isPast ? Colors.grey[600] : theme.colorScheme.primary,
@@ -64,21 +62,19 @@ class WorkoutCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 16),
-            // Кнопка записи или отмены
             ElevatedButton(
               style: ElevatedButton.styleFrom(
                 backgroundColor: isSignedUp
-                    ? Colors.grey[700] // Кнопка отмены
+                    ? Colors.grey[700]
                     : isPast
                         ? Colors.grey[800]
-                        : theme.colorScheme.primary, // Кнопка записи
+                        : theme.colorScheme.primary,
                 foregroundColor: Colors.white,
-                minimumSize: const Size(double.infinity, 40), // Во всю ширину
+                minimumSize: const Size(double.infinity, 40),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              // Отключаем кнопку, если тренировка прошла
               onPressed: isPast ? null : onPressed,
               child: Text(
                 isPast
