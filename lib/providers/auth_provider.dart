@@ -1,28 +1,26 @@
 import 'package:flutter/material.dart';
-import '../models/user_model.dart';
-import '../services/auth_service.dart';
-import 'user_provider.dart';
+import '../services/backend_auth_service.dart';
 
 class AuthProvider with ChangeNotifier {
-  final AuthService _authService = AuthService();
+  final BackendAuthService _authService = BackendAuthService();
 
   bool _isLoading = false;
   String? _errorMessage;
+  String? _token;
 
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  String? get token => _token;
 
-  final UserProvider _userProvider;
-  AuthProvider(this._userProvider);
+  AuthProvider();
 
-  Future<bool> login(String email, String password) async {
+  Future<bool> login(String username, String password) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final UserModel user = await _authService.login(email, password);
-      _userProvider.setUser(user);
+      _token = await _authService.login(username, password);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -40,17 +38,14 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String password,
   }) async {
+    // Используем email как username
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
     try {
-      final user = await _authService.register(
-        firstName: firstName,
-        lastName: lastName,
-        email: email,
-        password: password,
-      );
-      _userProvider.setUser(user);
+      await _authService.register(email, password);
+      // После регистрации сразу логинимся
+      _token = await _authService.login(email, password);
       _isLoading = false;
       notifyListeners();
       return true;
@@ -64,7 +59,7 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> logout() async {
     await _authService.logout();
-    _userProvider.clearUser();
+    _token = null;
     notifyListeners();
   }
 }

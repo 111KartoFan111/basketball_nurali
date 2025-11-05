@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/workout_card.dart'; // Импортируем наш виджет
+import '../widgets/workout_card.dart';
+import '../services/training_service.dart';
+import '../models/training_model.dart';
+import '../models/booking_model.dart';
 
 class ScheduleScreen extends StatefulWidget {
   const ScheduleScreen({super.key});
@@ -9,65 +12,81 @@ class ScheduleScreen extends StatefulWidget {
 }
 
 class _ScheduleScreenState extends State<ScheduleScreen> {
-  final List<Map<String, dynamic>> _workouts = [
-    {
-      'id': '1',
-      'title': 'Вечерняя тренировка (Вся команда)',
-      'location': 'Спортзал "Победа"',
-      'dateTime': DateTime.now().add(const Duration(days: 1, hours: 2)),
-      'isSignedUp': false,
-    },
-    {
-      'id': '2',
-      'title': 'Бросковая тренировка (Индивид.)',
-      'location': 'Площадка у парка',
-      'dateTime': DateTime.now().add(const Duration(days: 3, hours: 4)),
-      'isSignedUp': true,
-    },
-    {
-      'id': '3',
-      'title': 'ОФП (Мини-группа)',
-      'location': 'Тренажерный зал',
-      'dateTime': DateTime.now().subtract(const Duration(days: 1)), // Прошедшая
-      'isSignedUp': true,
-    },
-  ];
+  final _service = TrainingService();
+  List<TrainingModel> _trainings = [];
+  final Map<int, int> _myBookingByTraining = {}; // trainingId -> bookingId
+  bool _loading = true;
 
-  void _onSignUpToggle(String workoutId) {
-    setState(() {
-      final index = _workouts.indexWhere((w) => w['id'] == workoutId);
-      if (index != -1) {
-        _workouts[index]['isSignedUp'] = !_workouts[index]['isSignedUp'];
-      }
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(_workouts.firstWhere((w) => w['id'] == workoutId)['isSignedUp']
-            ? 'Вы записались на тренировку!'
-            : 'Вы отменили запись.'),
-        backgroundColor: Colors.green[600],
-        duration: const Duration(seconds: 2),
-      ),
-    );
+  @override
+  void initState() {
+    super.initState();
+    _load();
   }
 
+  Future<void> _load() async {
+    try {
+      final trainings = await _service.getSchedule();
+      List<BookingModel> my = [];
+      try {
+        my = await _service.myBookings();
+      } catch (_) {}
+      final map = {for (var b in my) b.trainingId: b.id};
+      setState(() {
+        _trainings = trainings;
+        _myBookingByTraining
+          ..clear()
+          ..addAll(map);
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _loading = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка загрузки: $e')),
+      );
+    }
+  }
+
+  Future<void> _toggle(int trainingId) async {
+    final booked = _myBookingByTraining.containsKey(trainingId);
+    try {
+      if (booked) {
+        final bookingId = _myBookingByTraining[trainingId]!;
+        await _service.cancelBooking(bookingId);
+        setState(() => _myBookingByTraining.remove(trainingId));
+      } else {
+        final b = await _service.book(trainingId);
+        setState(() => _myBookingByTraining[trainingId] = b.id);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка: $e')),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: const EdgeInsets.all(16.0),
-      itemCount: _workouts.length,
-      itemBuilder: (context, index) {
-        final workout = _workouts[index];
-        return WorkoutCard(
-          title: workout['title'],
-          location: workout['location'],
-          dateTime: workout['dateTime'],
-          isSignedUp: workout['isSignedUp'],
-          onPressed: () => _onSignUpToggle(workout['id']),
-        );
-      },
+    if (_loading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    return RefreshIndicator(
+      onRefresh: _load,
+      child: ListView.builder(
+        padding: const EdgeInsets.all(16.0),
+        itemCount: _trainings.length,
+        itemBuilder: (context, index) {
+          final t = _trainings[index];
+          final isSigned = _myBookingByTraining.containsKey(t.id);
+          return WorkoutCard(
+            title: t.title,
+            location: t.description ?? 'Спортзал',
+            dateTime: t.startsAt,
+            isSignedUp: isSigned,
+            onPressed: () => _toggle(t.id),
+          );
+        },
+      ),
     );
   }
 }

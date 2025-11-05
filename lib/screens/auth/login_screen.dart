@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const SizedBox(height: 24),
                   CustomButton(
                     text: isLoading ? 'Входим...' : 'Войти',
-                    onPressed: isLoading ? null : _login,
+                    onPressed: isLoading ? null : () => _login(),
                   ),
                   const SizedBox(height: 16),
                   TextButton(

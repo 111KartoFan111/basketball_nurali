@@ -20,13 +20,7 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider()),
-        ChangeNotifierProxyProvider<UserProvider, AuthProvider>(
-          create: (context) => AuthProvider(
-            Provider.of<UserProvider>(context, listen: false),
-          ),
-          update: (context, userProvider, authProvider) =>
-              authProvider ?? AuthProvider(userProvider),
-        ),
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
       ],
       child: const HoopConnectApp(),
     ),

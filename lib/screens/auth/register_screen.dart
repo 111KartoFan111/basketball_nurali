@@ -119,7 +119,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   const SizedBox(height: 24),
                   CustomButton(
                     text: isLoading ? 'Регистрируем...' : 'Зарегистрироваться',
-                    onPressed: isLoading ? null : _register,
+                    onPressed: isLoading ? null : () => _register(),
                   ),
                 ],
               ),

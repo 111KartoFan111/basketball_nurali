@@ -1,15 +1,31 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import '../utils/constants.dart';
 
 class ApiService {
+  static final ApiService _instance = ApiService._internal();
+  factory ApiService() => _instance;
+  ApiService._internal();
+
   String? _token;
 
-  void setToken(String? token) {
+  Future<void> setToken(String? token) async {
     _token = token;
+    final prefs = await SharedPreferences.getInstance();
+    if (token == null) {
+      await prefs.remove('auth_token');
+    } else {
+      await prefs.setString('auth_token', token);
+    }
   }
 
-  Future<Map<String, dynamic>> post(String endpoint, Map<String, dynamic> body) async {
+  Future<void> loadToken() async {
+    final prefs = await SharedPreferences.getInstance();
+    _token = prefs.getString('auth_token');
+  }
+
+  Future<dynamic> post(String endpoint, Map<String, dynamic> body) async {
     final url = Uri.parse('$kApiBaseUrl/$endpoint');
     final response = await http.post(
       url,
@@ -19,7 +35,7 @@ class ApiService {
     return _handleResponse(response);
   }
 
-  Future<Map<String, dynamic>> get(String endpoint) async {
+  Future<dynamic> get(String endpoint) async {
     final url = Uri.parse('$kApiBaseUrl/$endpoint');
     final response = await http.get(
       url,
@@ -28,9 +44,18 @@ class ApiService {
     return _handleResponse(response);
   }
 
+  Future<dynamic> delete(String endpoint) async {
+    final url = Uri.parse('$kApiBaseUrl/$endpoint');
+    final response = await http.delete(
+      url,
+      headers: _getHeaders(),
+    );
+    return _handleResponse(response);
+  }
+
   Map<String, String> _getHeaders() {
     final headers = <String, String>{
-      'Content-Type': 'application/json; charset=UTF-F',
+      'Content-Type': 'application/json; charset=UTF-8',
     };
     if (_token != null) {
       headers['Authorization'] = 'Bearer $_token';
@@ -38,13 +63,17 @@ class ApiService {
     return headers;
   }
 
-  Map<String, dynamic> _handleResponse(http.Response response) {
-    final body = jsonDecode(response.body);
+  dynamic _handleResponse(http.Response response) {
+    if (response.statusCode == 204 || response.body.isEmpty) {
+      return null;
+    }
+    final decoded = jsonDecode(response.body);
     if (response.statusCode >= 200 && response.statusCode < 300) {
-
-      return body['data'] as Map<String, dynamic>? ?? body;
+      return decoded;
     } else {
-      final message = body['message'] as String? ?? 'Unknown error';
+      final message = (decoded is Map && decoded['message'] is String)
+          ? decoded['message'] as String
+          : 'Unknown error';
       throw ApiException(message);
     }
   }
