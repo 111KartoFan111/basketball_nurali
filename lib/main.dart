@@ -13,8 +13,11 @@ import 'screens/profile_screen.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
-  // Загружаем сохраненный токен при запуске
-  await ApiService().loadToken();
+  // CRITICAL: Load saved token before running the app
+  final apiService = ApiService();
+  await apiService.loadToken();
+  
+  debugPrint('[Main] App starting, token loaded: ${apiService.isAuthenticated}');
   
   runApp(
     MultiProvider(
@@ -27,8 +30,63 @@ Future<void> main() async {
   );
 }
 
-class HoopConnectApp extends StatelessWidget {
+class HoopConnectApp extends StatefulWidget {
   const HoopConnectApp({super.key});
+
+  @override
+  State<HoopConnectApp> createState() => _HoopConnectAppState();
+}
+
+class _HoopConnectAppState extends State<HoopConnectApp> {
+  bool _checkingAuth = true;
+  bool _isAuthenticated = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthentication();
+  }
+
+  Future<void> _checkAuthentication() async {
+    final apiService = ApiService();
+    
+    debugPrint('[HoopConnect] Checking authentication...');
+    
+    // If no token, go to login
+    if (!apiService.isAuthenticated) {
+      debugPrint('[HoopConnect] No token found, showing login screen');
+      setState(() {
+        _checkingAuth = false;
+        _isAuthenticated = false;
+      });
+      return;
+    }
+
+    // Verify token is valid by making a test request
+    try {
+      debugPrint('[HoopConnect] Token found, verifying validity...');
+      await apiService.get('users/me');
+      debugPrint('[HoopConnect] Token is valid!');
+      
+      if (!mounted) return;
+      
+      setState(() {
+        _checkingAuth = false;
+        _isAuthenticated = true;
+      });
+    } catch (e) {
+      debugPrint('[HoopConnect] Token verification failed: $e');
+      // Token is invalid or expired, clear it
+      await apiService.setToken(null);
+      
+      if (!mounted) return;
+      
+      setState(() {
+        _checkingAuth = false;
+        _isAuthenticated = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -65,18 +123,27 @@ class HoopConnectApp extends StatelessWidget {
           hintStyle: TextStyle(color: Colors.grey[400]),
         ),
       ),
-      home: _getInitialScreen(),
+      home: _checkingAuth
+          ? Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Загрузка...',
+                      style: TextStyle(color: Colors.grey[400]),
+                    ),
+                  ],
+                ),
+              ),
+            )
+          : _isAuthenticated
+              ? const MainAppShell()
+              : const LoginScreen(),
       debugShowCheckedModeBanner: false,
     );
-  }
-
-  Widget _getInitialScreen() {
-    // Проверяем, есть ли сохраненный токен
-    final apiService = ApiService();
-    if (apiService.isAuthenticated) {
-      return const MainAppShell();
-    }
-    return const LoginScreen();
   }
 }
 

@@ -35,11 +35,11 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       final user = await _userService.getCurrentUser();
       if (!mounted) return;
       setState(() {
-        _isCoach = user.role == 'COACH';
+        _isCoach = user['role'] == 'COACH';
       });
     } catch (e) {
-      print('[ScheduleScreen] Could not load user role: $e');
       // Не критично, продолжаем работу
+      debugPrint('[ScheduleScreen] Could not load user role: $e');
     }
   }
 
@@ -59,7 +59,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         try {
           my = await _service.myBookings();
         } catch (e) {
-          print('[ScheduleScreen] Warning: Could not load bookings: $e');
+          debugPrint('[ScheduleScreen] Warning: Could not load bookings: $e');
         }
       }
       

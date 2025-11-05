@@ -1,69 +1,56 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'api_service.dart';
 
-import '../models/user_model.dart';
+class BackendAuthService {
+  final ApiService _api = ApiService();
 
-class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
-
-  Future<UserModel> login(String email, String password) async {
+  Future<String?> login(String username, String password) async {
     try {
-      final cred = await _auth.signInWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      final uid = cred.user!.uid;
-      final doc = await _db.collection('users').doc(uid).get();
-      if (!doc.exists) {
-        // Создаём минимальную запись, если отсутствует
-        final user = UserModel(
-          userId: uid,
-          email: cred.user!.email ?? email,
-          firstName: '',
-          lastName: '',
-          role: 'player',
-          dateOfBirth: null,
-          profilePhotoUrl: null,
-        );
-        await _db.collection('users').doc(uid).set(user.toJson());
-        return user;
+      final resp = await _api.post('auth/login', {
+        'username': username,
+        'password': password,
+      });
+      
+      if (resp == null) {
+        throw Exception('Пустой ответ от сервера');
       }
-      return UserModel.fromJson(doc.data()!);
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.message ?? 'Auth error');
+      
+      final token = resp['token'] as String?;
+      
+      if (token == null || token.isEmpty) {
+        throw Exception('Токен не получен от сервера');
+      }
+      
+      await _api.setToken(token);
+      return token;
+    } catch (e) {
+      debugPrint('[BackendAuthService] Login error: $e');
+      rethrow;
     }
   }
 
-  Future<UserModel> register({
-    required String firstName,
-    required String lastName,
-    required String email,
-    required String password,
-  }) async {
+  Future<void> register(String username, String password, {bool coach = false}) async {
     try {
-      final cred = await _auth.createUserWithEmailAndPassword(
-        email: email,
-        password: password,
-      );
-      final uid = cred.user!.uid;
-      final user = UserModel(
-        userId: uid,
-        email: cred.user!.email ?? email,
-        firstName: firstName,
-        lastName: lastName,
-        role: 'player',
-        dateOfBirth: null,
-        profilePhotoUrl: null,
-      );
-      await _db.collection('users').doc(uid).set(user.toJson());
-      return user;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(e.message ?? 'Registration error');
+      await _api.post('auth/register', {
+        'username': username,
+        'password': password,
+        'coach': coach,
+      });
+    } catch (e) {
+      debugPrint('[BackendAuthService] Register error: $e');
+      rethrow;
     }
   }
 
   Future<void> logout() async {
-    await _auth.signOut();
+    try {
+      await _api.setToken(null);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.remove('auth_token');
+    } catch (e) {
+      debugPrint('[BackendAuthService] Logout error: $e');
+      rethrow;
+    }
   }
 }

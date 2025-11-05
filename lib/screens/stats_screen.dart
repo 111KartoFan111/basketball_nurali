@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../widgets/stats_row.dart';
 import '../services/user_service.dart';
 import '../services/training_service.dart';
-import '../models/user_model.dart';
 
 class StatsScreen extends StatefulWidget {
   const StatsScreen({super.key});
@@ -17,7 +16,7 @@ class _StatsScreenState extends State<StatsScreen> {
   
   bool _showMyStats = true;
   bool _loading = true;
-  UserModel? _currentUser;
+  Map<String, dynamic>? _currentUser;
   int _totalTrainings = 0;
   int _upcomingTrainings = 0;
   int _completedTrainings = 0;
@@ -54,7 +53,7 @@ class _StatsScreenState extends State<StatsScreen> {
         final myBookings = await _trainingService.myBookings();
         bookings = myBookings.length;
       } catch (e) {
-        print('[StatsScreen] Could not load bookings: $e');
+        debugPrint('[StatsScreen] Could not load bookings: $e');
       }
       
       if (!mounted) return;
@@ -125,7 +124,9 @@ class _StatsScreenState extends State<StatsScreen> {
   }
 
   Widget _buildMyStatsView(BuildContext context) {
-    final isCoach = _currentUser?.role == 'COACH';
+    final isCoach = _currentUser?['role'] == 'COACH';
+    final firstName = _currentUser?['username'] as String? ?? '';
+    final firstLetter = firstName.isNotEmpty ? firstName.substring(0, 1).toUpperCase() : '?';
     
     return ListView(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -145,13 +146,13 @@ class _StatsScreenState extends State<StatsScreen> {
                   radius: 40,
                   backgroundColor: Colors.white24,
                   child: Text(
-                    _currentUser?.firstName.substring(0, 1).toUpperCase() ?? '?',
+                    firstLetter,
                     style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  '${_currentUser?.firstName ?? ''} ${_currentUser?.lastName ?? ''}',
+                  _currentUser?['username'] as String? ?? 'Пользователь',
                   style: const TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
