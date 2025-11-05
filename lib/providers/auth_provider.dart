@@ -38,13 +38,11 @@ class AuthProvider with ChangeNotifier {
     required String email,
     required String password,
   }) async {
-    // Используем email как username
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
     try {
       await _authService.register(email, password);
-      // После регистрации сразу логинимся
       _token = await _authService.login(email, password);
       _isLoading = false;
       notifyListeners();

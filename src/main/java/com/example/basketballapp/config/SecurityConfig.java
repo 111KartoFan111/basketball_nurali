@@ -40,18 +40,30 @@ public class SecurityConfig {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        // Public endpoints
+                        // ===== PUBLIC ENDPOINTS =====
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
                         
-                        // IMPORTANT: Allow GET /api/trainings without auth (view schedule)
-                        // But POST/PUT/DELETE require COACH role (handled by @PreAuthorize)
+                        // ВАЖНО: GET /api/trainings доступен БЕЗ аутентификации
+                                                .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/api/trainings").permitAll()
                         
-                        // All other endpoints require authentication
+                        // ===== PROTECTED ENDPOINTS - требуют аутентификации ====
+                        .requestMatchers("/api/trainings/**").permitAll()
+                        
+                        // ===== PROTECTED ENDPOINTS - требуют аутентификации =====
+                        // POST/PUT/DELETE /api/trainings требуют роли COACH (@PreAuthorize)
+                        // GET /api/bookings/me требует аутентификации
+                        // POST /api/bookings требует аутентификации
+                        // DELETE /api/bookings требует аутентификации
+                        // GET /api/users/me требует аутентификации
+                        
+                        // Все остальные запросы требуют аутентификации
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
+        
         return http.build();
     }
 
@@ -59,8 +71,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOriginPatterns(List.of("*"));
-        cfg.setAllowedMethods(List.of("GET","POST","PUT","DELETE","OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization","Content-Type"));
+        cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
         cfg.setAllowCredentials(false);
         cfg.setMaxAge(3600L); // Cache preflight for 1 hour
         

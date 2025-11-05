@@ -22,7 +22,7 @@ public class UserController {
         UserDto dto = new UserDto();
         dto.setId(user.getId());
         dto.setUsername(user.getUsername());
-        dto.setRole(user.getRole().name());
+        dto.setRole(user.getRole());
         return ResponseEntity.ok(dto);
     }
 }

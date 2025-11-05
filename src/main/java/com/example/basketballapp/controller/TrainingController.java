@@ -1,6 +1,7 @@
 package com.example.basketballapp.controller;
 
 import com.example.basketballapp.dto.TrainingDto;
+import com.example.basketballapp.dto.TrainingResponseDto;
 import com.example.basketballapp.model.Training;
 import com.example.basketballapp.service.TrainingService;
 import jakarta.validation.Valid;
@@ -23,11 +24,15 @@ public class TrainingController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Training>> schedule(
+    public ResponseEntity<List<TrainingResponseDto>> schedule(
             @RequestParam(name = "from", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime from,
             @RequestParam(name = "to", required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) OffsetDateTime to
     ) {
-        return ResponseEntity.ok(trainingService.getSchedule(from, to));
+        List<Training> trainings = trainingService.getSchedule(from, to);
+        List<TrainingResponseDto> dtos = trainings.stream()
+                .map(TrainingResponseDto::fromEntity)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @PreAuthorize("hasRole('COACH')")
