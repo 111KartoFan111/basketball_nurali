@@ -170,7 +170,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'Откройте @HoopConnectBot в Telegram\nи отправьте /myid для получения ID',
+                          'Откройте @basketballappres_bot в Telegram\nи отправьте /myid для получения ID',
                           style: TextStyle(
                             color: Colors.blue[300],
                             fontSize: 13,

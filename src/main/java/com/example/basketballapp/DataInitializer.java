@@ -23,22 +23,22 @@ public class DataInitializer {
         return args -> {
             // ============ СОЗДАНИЕ ПОЛЬЗОВАТЕЛЕЙ ============
             User coach = null;
-            if (!userRepository.existsByUsername("coach")) {
+            if (!userRepository.existsByUsername("coach@gmail.com")) {
                 coach = new User("coach", encoder.encode("coach123"), Role.COACH);
                 userRepository.save(coach);
-                log.info("✅ Создан тренер: coach / coach123");
+                log.info("✅ Создан тренер: coach@gmail.com / coach123");
             } else {
                 coach = userRepository.findByUsername("coach").orElseThrow();
                 log.info("ℹ️ Тренер уже существует");
             }
 
-            if (!userRepository.existsByUsername("player1")) {
+            if (!userRepository.existsByUsername("player1@gmail.com")) {
                 User player1 = new User("player1", encoder.encode("player123"), Role.USER);
                 userRepository.save(player1);
                 log.info("✅ Создан игрок 1: player1 / player123");
             }
 
-            if (!userRepository.existsByUsername("player2")) {
+            if (!userRepository.existsByUsername("player2@gmail.com")) {
                 User player2 = new User("player2", encoder.encode("player123"), Role.USER);
                 userRepository.save(player2);
                 log.info("✅ Создан игрок 2: player2 / player123");
