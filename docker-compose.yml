@@ -1,0 +1,31 @@
+version: "3.9"
+
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: basketball
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+  backend:
+    build: .
+    image: basketball-app:latest
+    depends_on:
+      - db
+    environment:
+      DB_URL: jdbc:postgresql://db:5432/basketball
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      JWT_SECRET: super-secret-change-me-please-very-long
+      JWT_EXPIRATION_MS: 86400000
+    ports:
+      - "8080:8080"
+
+volumes:
+  db-data: {}

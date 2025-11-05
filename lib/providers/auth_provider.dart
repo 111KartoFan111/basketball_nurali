@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
 import '../models/user_model.dart';
 import '../services/auth_service.dart';
-import 'user_provider.dart'; // Импортируем UserProvider
+import 'user_provider.dart';
 
-// Управляет состоянием аутентификации (загрузка, ошибка, токен)
-// Он также будет управлять вызовом UserProvider
 class AuthProvider with ChangeNotifier {
   final AuthService _authService = AuthService();
-  
-  // Приватные состояния
+
   bool _isLoading = false;
   String? _errorMessage;
-  String? _token; // Мы не храним токен здесь, он в ApiService
 
-  // Геттеры для UI
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
-  bool get isAuthenticated => _token != null; // 'ApiService' должен иметь геттер
 
   final UserProvider _userProvider;
   AuthProvider(this._userProvider);
@@ -28,12 +22,38 @@ class AuthProvider with ChangeNotifier {
 
     try {
       final UserModel user = await _authService.login(email, password);
-      _isLoading = false;
-      _token = '...';
       _userProvider.setUser(user);
+      _isLoading = false;
       notifyListeners();
       return true;
+    } catch (e) {
+      _isLoading = false;
+      _errorMessage = e.toString();
+      notifyListeners();
+      return false;
+    }
+  }
 
+  Future<bool> register({
+    required String firstName,
+    required String lastName,
+    required String email,
+    required String password,
+  }) async {
+    _isLoading = true;
+    _errorMessage = null;
+    notifyListeners();
+    try {
+      final user = await _authService.register(
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        password: password,
+      );
+      _userProvider.setUser(user);
+      _isLoading = false;
+      notifyListeners();
+      return true;
     } catch (e) {
       _isLoading = false;
       _errorMessage = e.toString();
@@ -44,10 +64,7 @@ class AuthProvider with ChangeNotifier {
 
   Future<void> logout() async {
     await _authService.logout();
-    _token = null;
-    _userProvider.clearUser(); // <<-- Очищаем UserProvider
+    _userProvider.clearUser();
     notifyListeners();
   }
-
-  // TODO: Добавить метод register
 }

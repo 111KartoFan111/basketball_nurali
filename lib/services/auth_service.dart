@@ -1,25 +1,37 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+
 import '../models/user_model.dart';
-import 'api_service.dart';
 
 class AuthService {
-  final ApiService _apiService = ApiService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   Future<UserModel> login(String email, String password) async {
     try {
-      final response = await _apiService.post('auth/login', {
-        'email': email,
-        'password': password,
-      });
-
-      final token = response['token'] as String;
-      final userData = response['user'] as Map<String, dynamic>;
-
-      _apiService.setToken(token);
-
-      return UserModel.fromJson(userData);
-
-    } catch (e) {
-      throw ApiException(e.toString());
+      final cred = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final uid = cred.user!.uid;
+      final doc = await _db.collection('users').doc(uid).get();
+      if (!doc.exists) {
+        // Создаём минимальную запись, если отсутствует
+        final user = UserModel(
+          userId: uid,
+          email: cred.user!.email ?? email,
+          firstName: '',
+          lastName: '',
+          role: 'player',
+          dateOfBirth: null,
+          profilePhotoUrl: null,
+        );
+        await _db.collection('users').doc(uid).set(user.toJson());
+        return user;
+      }
+      return UserModel.fromJson(doc.data()!);
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message ?? 'Auth error');
     }
   }
 
@@ -30,22 +42,28 @@ class AuthService {
     required String password,
   }) async {
     try {
-      final response = await _apiService.post('auth/register', {
-        'first_name': firstName,
-        'last_name': lastName,
-        'email': email,
-        'password': password,
-        'role': 'player',
-      });
-
-      return UserModel.fromJson(response);
-
-    } catch (e) {
-       throw ApiException(e.toString());
+      final cred = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      final uid = cred.user!.uid;
+      final user = UserModel(
+        userId: uid,
+        email: cred.user!.email ?? email,
+        firstName: firstName,
+        lastName: lastName,
+        role: 'player',
+        dateOfBirth: null,
+        profilePhotoUrl: null,
+      );
+      await _db.collection('users').doc(uid).set(user.toJson());
+      return user;
+    } on FirebaseAuthException catch (e) {
+      throw Exception(e.message ?? 'Registration error');
     }
   }
 
   Future<void> logout() async {
-    _apiService.setToken(null);
+    await _auth.signOut();
   }
 }

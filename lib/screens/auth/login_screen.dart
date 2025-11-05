@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import '../../widgets/custom_button.dart';
 import 'register_screen.dart';
-import '../../main.dart'; // Для перехода на MainAppShell
+import '../../main.dart';
+import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -22,15 +25,30 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _login() {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (context) => const MainAppShell()),
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+    final auth = context.read<AuthProvider>();
+    final ok = await auth.login(
+      _emailController.text.trim(),
+      _passwordController.text.trim(),
     );
+    if (!mounted) return;
+    if (ok) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const MainAppShell()),
+      );
+    } else {
+      final msg = auth.errorMessage ?? 'Ошибка входа';
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(msg)),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = context.watch<AuthProvider>().isLoading;
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -78,8 +96,8 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 24),
                   CustomButton(
-                    text: 'Войти',
-                    onPressed: _login,
+                    text: isLoading ? 'Входим...' : 'Войти',
+                    onPressed: isLoading ? null : _login,
                   ),
                   const SizedBox(height: 16),
                   TextButton(
