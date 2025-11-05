@@ -90,11 +90,12 @@ class TrainingService {
     required int capacity,
   }) async {
     try {
+      // Send timestamps in UTC with offset so server can deserialize to OffsetDateTime
       final data = {
         'title': title,
         'description': description,
-        'startsAt': startsAt.toIso8601String(),
-        'endsAt': endsAt.toIso8601String(),
+        'startsAt': startsAt.toUtc().toIso8601String(),
+        'endsAt': endsAt.toUtc().toIso8601String(),
         'capacity': capacity,
       };
 

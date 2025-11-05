@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 import 'providers/auth_provider.dart';
@@ -12,6 +14,13 @@ import 'screens/profile_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  
+  // Initialize locale/date formatting (fixes LocaleDataException)
+  // initializeDateFormatting without arguments initializes commonly used locales.
+  await initializeDateFormatting();
+
+  // Optionally set default locale if you want Russian formatting by default
+  // Intl.defaultLocale = 'ru_RU';
   
   // CRITICAL: Load saved token before running the app
   final apiService = ApiService();

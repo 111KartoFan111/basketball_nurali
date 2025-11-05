@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.http.HttpMethod;
 
 import java.util.List;
 
@@ -45,7 +46,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         
                         // ВАЖНО: GET /api/trainings доступен БЕЗ аутентификации
-                        .requestMatchers("GET", "/api/trainings").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/trainings").permitAll()
+                        // Temporary debug endpoints to inspect authentication from client
+                        .requestMatchers("/api/debug/**").permitAll()
                         
                         // ===== PROTECTED ENDPOINTS - требуют аутентификации =====
                         // POST/PUT/DELETE /api/trainings требуют роли COACH (@PreAuthorize)

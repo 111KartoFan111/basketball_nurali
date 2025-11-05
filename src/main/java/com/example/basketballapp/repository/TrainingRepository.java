@@ -10,7 +10,6 @@ import java.util.List;
 
 public interface TrainingRepository extends JpaRepository<Training, Long> {
     
-    // ИСПРАВЛЕНО: Добавлен JOIN FETCH для загрузки coach вместе с training
     @Query("SELECT t FROM Training t JOIN FETCH t.coach WHERE t.startsAt BETWEEN :from AND :to ORDER BY t.startsAt ASC")
     List<Training> findByStartsAtBetweenOrderByStartsAtAsc(
         @Param("from") OffsetDateTime from, 
