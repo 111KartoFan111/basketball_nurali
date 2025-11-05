@@ -19,6 +19,10 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 16)
     private Role role = Role.USER;
+    
+    // НОВОЕ ПОЛЕ: Telegram ID для сброса пароля
+    @Column(unique = true)
+    private Long telegramId;
 
     public User() {}
 
@@ -38,6 +42,9 @@ public class User {
 
     public Role getRole() { return role; }
     public void setRole(Role role) { this.role = role; }
+    
+    public Long getTelegramId() { return telegramId; }
+    public void setTelegramId(Long telegramId) { this.telegramId = telegramId; }
 
     @Override
     public boolean equals(Object o) {

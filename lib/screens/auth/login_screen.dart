@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../widgets/custom_button.dart';
 import 'register_screen.dart';
 import '../../main.dart';
+import '../../screens/forgot_password_screen.dart';
 import '../../providers/auth_provider.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -98,6 +99,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   CustomButton(
                     text: isLoading ? 'Входим...' : 'Войти',
                     onPressed: isLoading ? null : () => _login(),
+                  ),
+                  const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      'Забыл пароль?',
+                      style: TextStyle(color: Colors.orangeAccent),
+                    ),
                   ),
                   const SizedBox(height: 16),
                   TextButton(

@@ -44,6 +44,7 @@ public class SecurityConfig {
                         // ===== PUBLIC ENDPOINTS =====
                         .requestMatchers("/actuator/health").permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers("/api/password-reset/**").permitAll() // Сброс пароля
                         
                         // ВАЖНО: GET /api/trainings доступен БЕЗ аутентификации
                         .requestMatchers(HttpMethod.GET, "/api/trainings").permitAll()

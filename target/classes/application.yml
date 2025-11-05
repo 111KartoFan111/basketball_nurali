@@ -17,6 +17,10 @@ spring:
   jackson:
     serialization:
       WRITE_DATES_AS_TIMESTAMPS: false
+  # Включаем планировщик для очистки истекших кодов
+  task:
+    scheduling:
+      enabled: true
 
 management:
   endpoints:
@@ -34,3 +38,8 @@ app:
     # Используем достаточно длинный секрет (минимум 256 бит для HS256)
     secret: ${JWT_SECRET:my-super-secret-key-for-basketball-app-must-be-at-least-256-bits-long-12345}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
+
+# Telegram Bot Configuration
+telegram:
+  bot:
+    token: ${TELEGRAM_BOT_TOKEN:8480431087:AAEOqJM13VNgv4v6jX87UFsW2sLFT-CiyWE}
