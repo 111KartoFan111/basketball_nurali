@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:firebase_core/firebase_core.dart';
 
-import 'firebase_options.dart';
 import 'providers/auth_provider.dart';
 import 'providers/user_provider.dart';
+import 'services/api_service.dart';
 
 import 'screens/auth/login_screen.dart';
 import 'screens/schedule_screen.dart';
@@ -13,9 +12,10 @@ import 'screens/profile_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  
+  // Загружаем сохраненный токен при запуске
+  await ApiService().loadToken();
+  
   runApp(
     MultiProvider(
       providers: [
@@ -65,9 +65,18 @@ class HoopConnectApp extends StatelessWidget {
           hintStyle: TextStyle(color: Colors.grey[400]),
         ),
       ),
-      home: const LoginScreen(),
+      home: _getInitialScreen(),
       debugShowCheckedModeBanner: false,
     );
+  }
+
+  Widget _getInitialScreen() {
+    // Проверяем, есть ли сохраненный токен
+    final apiService = ApiService();
+    if (apiService.isAuthenticated) {
+      return const MainAppShell();
+    }
+    return const LoginScreen();
   }
 }
 
@@ -125,6 +134,7 @@ class _MainAppShellState extends State<MainAppShell> {
       ),
     );
   }
+  
   String _getAppBarTitle(int index) {
     switch (index) {
       case 0:
@@ -138,4 +148,3 @@ class _MainAppShellState extends State<MainAppShell> {
     }
   }
 }
-

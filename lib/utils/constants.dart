@@ -1,26 +1,37 @@
 // lib/utils/constants.dart
 
-// Выберите нужную конфигурацию раскомментировав соответствующую строку
+import 'package:flutter/foundation.dart';
 
-// ====== DEVELOPMENT ======
+// ====== API CONFIGURATION ======
 
 // Для Android эмулятора (10.0.2.2 указывает на localhost хост-машины)
-//const String kApiBaseUrl = 'http://10.0.2.2:8080/api';
+const String kAndroidEmulatorUrl = 'http://10.0.2.2:8080/api';
 
 // Для iOS симулятора (localhost работает напрямую)
-const String kApiBaseUrl = 'http://localhost:8080/api';
+const String kIosSimulatorUrl = 'http://localhost:8080/api';
 
 // Для физического устройства в локальной сети
 // Замените YOUR_COMPUTER_IP на IP адрес вашего компьютера
-// Чтобы узнать IP:
-//   macOS/Linux: ifconfig | grep "inet " или ip addr show
-//   Windows: ipconfig
-// const String kApiBaseUrl = 'http://192.168.1.XXX:8080/api';
-
-// ====== PRODUCTION ======
+const String kPhysicalDeviceUrl = 'http://192.168.1.XXX:8080/api';
 
 // Для продакшн сервера
-// const String kApiBaseUrl = 'https://your-domain.com/api';
+const String kProductionUrl = 'https://your-domain.com/api';
+
+// Автоматический выбор URL в зависимости от платформы
+String get kApiBaseUrl {
+  if (kReleaseMode) {
+    return kProductionUrl;
+  }
+  
+  // В режиме разработки определяем платформу
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    return kAndroidEmulatorUrl;
+  } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    return kIosSimulatorUrl;
+  }
+  
+  return kIosSimulatorUrl; // По умолчанию для desktop
+}
 
 // ====== ДРУГИЕ КОНСТАНТЫ ======
 

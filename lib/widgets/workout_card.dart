@@ -6,6 +6,7 @@ class WorkoutCard extends StatelessWidget {
   final DateTime dateTime;
   final bool isSignedUp;
   final VoidCallback onPressed;
+  final bool isCoach;
 
   const WorkoutCard({
     super.key,
@@ -14,6 +15,7 @@ class WorkoutCard extends StatelessWidget {
     required this.dateTime,
     required this.isSignedUp,
     required this.onPressed,
+    this.isCoach = false,
   });
 
   @override
@@ -31,13 +33,25 @@ class WorkoutCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              '${dateTime.day}.${dateTime.month}.${dateTime.year} - ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}',
-              style: TextStyle(
-                color: isPast ? Colors.grey[600] : theme.colorScheme.primary,
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-              ),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${dateTime.day}.${dateTime.month}.${dateTime.year} - ${dateTime.hour}:${dateTime.minute.toString().padLeft(2, '0')}',
+                    style: TextStyle(
+                      color: isPast ? Colors.grey[600] : theme.colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+                if (isCoach)
+                  Icon(
+                    Icons.admin_panel_settings,
+                    color: theme.colorScheme.primary,
+                    size: 20,
+                  ),
+              ],
             ),
             const SizedBox(height: 8),
             Text(
@@ -55,31 +69,37 @@ class WorkoutCard extends StatelessWidget {
                 Icon(Icons.location_on_outlined,
                     size: 16, color: Colors.grey[400]),
                 const SizedBox(width: 4),
-                Text(
-                  location,
-                  style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                Expanded(
+                  child: Text(
+                    location,
+                    style: TextStyle(fontSize: 14, color: Colors.grey[400]),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: isSignedUp
-                    ? Colors.grey[700]
-                    : isPast
-                        ? Colors.grey[800]
-                        : theme.colorScheme.primary,
+                backgroundColor: isCoach
+                    ? theme.colorScheme.primary
+                    : isSignedUp
+                        ? Colors.grey[700]
+                        : isPast
+                            ? Colors.grey[800]
+                            : theme.colorScheme.primary,
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 40),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8),
                 ),
               ),
-              onPressed: isPast ? null : onPressed,
+              onPressed: (isPast && !isCoach) ? null : onPressed,
               child: Text(
-                isPast
-                    ? 'Тренировка прошла'
-                    : (isSignedUp ? 'Отменить запись' : 'Записаться'),
+                isCoach
+                    ? 'Управление'
+                    : isPast
+                        ? 'Тренировка прошла'
+                        : (isSignedUp ? 'Отменить запись' : 'Записаться'),
               ),
             )
           ],
