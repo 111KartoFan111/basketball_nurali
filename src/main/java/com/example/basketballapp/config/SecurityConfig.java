@@ -45,19 +45,13 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         
                         // ВАЖНО: GET /api/trainings доступен БЕЗ аутентификации
-                                                .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/api/trainings").permitAll()
-                        
-                        // ===== PROTECTED ENDPOINTS - требуют аутентификации ====
-                        .requestMatchers("/api/trainings/**").permitAll()
+                        .requestMatchers("GET", "/api/trainings").permitAll()
                         
                         // ===== PROTECTED ENDPOINTS - требуют аутентификации =====
                         // POST/PUT/DELETE /api/trainings требуют роли COACH (@PreAuthorize)
-                        // GET /api/bookings/me требует аутентификации
-                        // POST /api/bookings требует аутентификации
-                        // DELETE /api/bookings требует аутентификации
-                        // GET /api/users/me требует аутентификации
+                        .requestMatchers("/api/trainings/**").authenticated()
+                        .requestMatchers("/api/bookings/**").authenticated()
+                        .requestMatchers("/api/users/**").authenticated()
                         
                         // Все остальные запросы требуют аутентификации
                         .anyRequest().authenticated()
@@ -72,9 +66,9 @@ public class SecurityConfig {
         CorsConfiguration cfg = new CorsConfiguration();
         cfg.setAllowedOriginPatterns(List.of("*"));
         cfg.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
-        cfg.setAllowedHeaders(List.of("Authorization", "Content-Type", "Accept"));
+        cfg.setAllowedHeaders(List.of("*"));
         cfg.setAllowCredentials(false);
-        cfg.setMaxAge(3600L); // Cache preflight for 1 hour
+        cfg.setMaxAge(3600L);
         
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", cfg);

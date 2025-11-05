@@ -24,7 +24,13 @@ management:
       exposure:
         include: health
 
+logging:
+  level:
+    com.example.basketballapp: DEBUG
+    org.springframework.security: DEBUG
+
 app:
   jwt:
-    secret: ${JWT_SECRET:change-me-please-change-me-please}
+    # Используем достаточно длинный секрет (минимум 256 бит для HS256)
+    secret: ${JWT_SECRET:my-super-secret-key-for-basketball-app-must-be-at-least-256-bits-long-12345}
     expiration-ms: ${JWT_EXPIRATION_MS:86400000}
