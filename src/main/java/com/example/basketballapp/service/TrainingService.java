@@ -22,10 +22,22 @@ public class TrainingService {
         this.userService = userService;
     }
 
+    // ИСПРАВЛЕНО: Добавлен @Transactional(readOnly = true) для предотвращения LazyInitializationException
+    @Transactional(readOnly = true)
     public List<Training> getSchedule(OffsetDateTime from, OffsetDateTime to) {
         if (from == null) from = OffsetDateTime.now().minusDays(1);
         if (to == null) to = OffsetDateTime.now().plusDays(30);
-        return trainingRepository.findByStartsAtBetweenOrderByStartsAtAsc(from, to);
+        
+        List<Training> trainings = trainingRepository.findByStartsAtBetweenOrderByStartsAtAsc(from, to);
+        
+        // Принудительная инициализация coach для предотвращения lazy loading
+        trainings.forEach(t -> {
+            if (t.getCoach() != null) {
+                t.getCoach().getUsername(); // Инициализируем proxy
+            }
+        });
+        
+        return trainings;
     }
 
     @Transactional

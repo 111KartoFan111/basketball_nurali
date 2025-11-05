@@ -29,7 +29,8 @@ public class Training {
     @Column(nullable = false)
     private boolean canceled = false;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    // ИСПРАВЛЕНО: Изменен fetch type с LAZY на EAGER для coach
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "coach_id", nullable = false)
     private User coach;
 
