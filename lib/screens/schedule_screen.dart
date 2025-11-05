@@ -31,6 +31,9 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         my = await _service.myBookings();
       } catch (_) {}
       final map = {for (var b in my) b.trainingId: b.id};
+      
+      if (!mounted) return; // Проверка перед setState
+      
       setState(() {
         _trainings = trainings;
         _myBookingByTraining
@@ -39,7 +42,7 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
         _loading = false;
       });
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) return; // Проверка перед использованием context
       setState(() => _loading = false);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка загрузки: $e')),
@@ -53,12 +56,15 @@ class _ScheduleScreenState extends State<ScheduleScreen> {
       if (booked) {
         final bookingId = _myBookingByTraining[trainingId]!;
         await _service.cancelBooking(bookingId);
+        if (!mounted) return; // Проверка перед setState
         setState(() => _myBookingByTraining.remove(trainingId));
       } else {
         final b = await _service.book(trainingId);
+        if (!mounted) return; // Проверка перед setState
         setState(() => _myBookingByTraining[trainingId] = b.id);
       }
     } catch (e) {
+      if (!mounted) return; // Проверка перед использованием context
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Ошибка: $e')),
       );
