@@ -24,22 +24,23 @@ public class DataInitializer {
             // ============ СОЗДАНИЕ ПОЛЬЗОВАТЕЛЕЙ ============
             User coach = null;
             if (!userRepository.existsByUsername("coach@gmail.com")) {
-                coach = new User("coach", encoder.encode("coach123"), Role.COACH);
+                coach = new User("coach@gmail.com", encoder.encode("coach123"), Role.COACH);
                 userRepository.save(coach);
                 log.info("✅ Создан тренер: coach@gmail.com / coach123");
             } else {
-                coach = userRepository.findByUsername("coach").orElseThrow();
+                // username is stored as email (coach@gmail.com) — use the same key
+                coach = userRepository.findByUsername("coach@gmail.com").orElseThrow();
                 log.info("ℹ️ Тренер уже существует");
             }
 
-            if (!userRepository.existsByUsername("player1@gmail.com")) {
-                User player1 = new User("player1", encoder.encode("player123"), Role.USER);
+            if (!userRepository.existsByUsername("nurali@gmail.com")) {
+                User player1 = new User("nurali@gmail.com", encoder.encode("player123"), Role.USER);
                 userRepository.save(player1);
                 log.info("✅ Создан игрок 1: player1 / player123");
             }
 
-            if (!userRepository.existsByUsername("player2@gmail.com")) {
-                User player2 = new User("player2", encoder.encode("player123"), Role.USER);
+            if (!userRepository.existsByUsername("player@gmail.com")) {
+                User player2 = new User("player@gmail.com", encoder.encode("player123"), Role.USER);
                 userRepository.save(player2);
                 log.info("✅ Создан игрок 2: player2 / player123");
             }
@@ -140,7 +141,7 @@ public class DataInitializer {
                 log.info("║                  🏀 ДАННЫЕ УСПЕШНО ЗАГРУЖЕНЫ 🏀             ║");
                 log.info("╠════════════════════════════════════════════════════════════╣");
                 log.info("║ УЧЕТНЫЕ ДАННЫЕ ТРЕНЕРА:                                    ║");
-                log.info("║   Логин:    coach                                          ║");
+                log.info("║   Логин:    coach@gmail.com                                 ║");
                 log.info("║   Пароль:   coach123                                       ║");
                 log.info("║                                                            ║");
                 log.info("║ УЧЕТНЫЕ ДАННЫЕ ИГРОКОВ:                                    ║");

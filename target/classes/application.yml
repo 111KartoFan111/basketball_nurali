@@ -42,4 +42,4 @@ app:
 # Telegram Bot Configuration
 telegram:
   bot:
-    token: ${TELEGRAM_BOT_TOKEN:8480431087:AAEOqJM13VNgv4v6jX87UFsW2sLFT-CiyWE}
+    token: ${TELEGRAM_BOT_TOKEN:}

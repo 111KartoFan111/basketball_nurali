@@ -24,12 +24,16 @@ public class Booking {
     @Column(nullable = false)
     private OffsetDateTime createdAt = OffsetDateTime.now();
 
+    @Column(nullable = false, columnDefinition = "boolean default false")
+    private Boolean canceled = false;
+
     public Booking() {}
 
     public Booking(User user, Training training) {
         this.user = user;
         this.training = training;
         this.createdAt = OffsetDateTime.now();
+        this.canceled = false;
     }
 
     public Long getId() { return id; }
@@ -38,6 +42,8 @@ public class Booking {
     public Training getTraining() { return training; }
     public void setTraining(Training training) { this.training = training; }
     public OffsetDateTime getCreatedAt() { return createdAt; }
+    public Boolean getCanceled() { return canceled; }
+    public void setCanceled(Boolean canceled) { this.canceled = canceled; }
 
     @Override
     public boolean equals(Object o) {
